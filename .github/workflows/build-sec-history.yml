@@ -9,7 +9,9 @@ on:
 jobs:
 
   x64_build:
-    runs-on: windows-latest
+    # windows-latest 已切換至未預裝 MFC/ATL 的 Visual Studio 18 映像，
+    # 因此固定使用仍包含 Microsoft.VisualStudio.Component.VC.ATLMFC 的 windows-2022
+    runs-on: windows-2022
 
     steps:
     - uses: actions/checkout@v4

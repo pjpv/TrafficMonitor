@@ -12,7 +12,7 @@
 IMPLEMENT_DYNAMIC(CHistoryTrafficDlg, CBaseDialog)
 
 CHistoryTrafficDlg::CHistoryTrafficDlg(deque<HistoryTraffic>& history_traffics, CWnd* pParent /*=NULL*/)
-    : CBaseDialog(IDD_HISTORY_TRAFFIC_DIALOG, pParent), m_history_traffics(history_traffics), m_tab1_dlg(history_traffics, this), m_tab2_dlg(history_traffics, this)
+    : CBaseDialog(IDD_HISTORY_TRAFFIC_DIALOG, pParent), m_history_traffics(history_traffics), m_tab1_dlg(history_traffics, this), m_tab2_dlg(history_traffics, this), m_tab3_dlg(this)
 {
 
 }
@@ -45,6 +45,7 @@ void CHistoryTrafficDlg::SetTabWndSize()
     rect.right -= 4;
     m_tab1_dlg.MoveWindow(&rect);
     m_tab2_dlg.MoveWindow(&rect);
+    m_tab3_dlg.MoveWindow(&rect);
 }
 
 
@@ -68,9 +69,11 @@ BOOL CHistoryTrafficDlg::OnInitDialog()
     //插入标签
     m_tab.InsertItem(0, CCommon::LoadText(IDS_LIST_VIEW));
     m_tab.InsertItem(1, CCommon::LoadText(IDS_CALENDAR_VIEW));
+    m_tab.InsertItem(2, CCommon::LoadText(L"TXT_TAB_REALTIME"));
     //创建子对话框
     m_tab1_dlg.Create(IDD_HISTORY_TRAFFIC_LIST_DIALOG, &m_tab);
     m_tab2_dlg.Create(IDD_HISTORY_TRAFFIC_CALENDAR_DIALOG, &m_tab);
+    m_tab3_dlg.Create(IDD_HISTORY_TRAFFIC_REALTIME_DIALOG, &m_tab);
     //调整子对话框的大小和位置
     SetTabWndSize();
     //设置默认选中的标签
@@ -81,6 +84,9 @@ BOOL CHistoryTrafficDlg::OnInitDialog()
         break;
     case 1:
         m_tab2_dlg.ShowWindow(SW_SHOW);
+        break;
+    case 2:
+        m_tab3_dlg.ShowWindow(SW_SHOW);
         break;
     }
     m_tab.SetCurFocus(m_tab_selected);
@@ -119,12 +125,21 @@ void CHistoryTrafficDlg::OnTcnSelchangeTab1(NMHDR* pNMHDR, LRESULT* pResult)
     case 0:
         m_tab1_dlg.ShowWindow(SW_SHOW);
         m_tab2_dlg.ShowWindow(SW_HIDE);
+        m_tab3_dlg.ShowWindow(SW_HIDE);
         m_tab1_dlg.SetFocus();
         break;
     case 1:
         m_tab2_dlg.ShowWindow(SW_SHOW);
         m_tab1_dlg.ShowWindow(SW_HIDE);
+        m_tab3_dlg.ShowWindow(SW_HIDE);
         m_tab2_dlg.SetFocus();
+        break;
+    case 2:
+        m_tab3_dlg.ShowWindow(SW_SHOW);
+        m_tab1_dlg.ShowWindow(SW_HIDE);
+        m_tab2_dlg.ShowWindow(SW_HIDE);
+        m_tab3_dlg.OnTabEntered();
+        m_tab3_dlg.SetFocus();
         break;
     }
     *pResult = 0;
@@ -136,7 +151,7 @@ void CHistoryTrafficDlg::OnSize(UINT nType, int cx, int cy)
     CBaseDialog::OnSize(nType, cx, cy);
 
     // TODO: 在此处添加消息处理程序代码
-    if (nType != SIZE_MINIMIZED && m_tab1_dlg.GetSafeHwnd() != NULL && m_tab2_dlg.GetSafeHwnd() != NULL)
+    if (nType != SIZE_MINIMIZED && m_tab1_dlg.GetSafeHwnd() != NULL && m_tab2_dlg.GetSafeHwnd() != NULL && m_tab3_dlg.GetSafeHwnd() != NULL)
     {
         SetTabWndSize();
     }

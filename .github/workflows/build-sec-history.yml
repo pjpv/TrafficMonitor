@@ -1,0 +1,29 @@
+name: Build Sec History
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/sec-history
+
+jobs:
+
+  x64_build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Run msbuild
+      run: msbuild TrafficMonitor_Lite.sln -p:configuration="Release (lite)" -p:platform=x64 -p:platformToolset=v143 -m
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: TrafficMonitor_x64_sec_history
+        path: |
+          Bin/x64/Release (lite)/TrafficMonitor.exe
+          Bin/x64/Release (lite)/*.dll

@@ -346,6 +346,12 @@
     <ClInclude Include="HistoryTrafficCalendarDlg.h">
       <Filter>源文件和头文件\对话框类\HistoryTrafficDlg</Filter>
     </ClInclude>
+    <ClInclude Include="HistoryTrafficRealtimeDlg.h">
+      <Filter>源文件和头文件\对话框类\HistoryTrafficDlg</Filter>
+    </ClInclude>
+    <ClInclude Include="SecTrafficStore.h">
+      <Filter>源文件和头文件\公共的类\HistoryTrafficFile</Filter>
+    </ClInclude>
     <ClInclude Include="CalendarHelper.h">
       <Filter>源文件和头文件\公共的类\CalendarHelper</Filter>
     </ClInclude>
@@ -644,6 +650,12 @@
     </ClCompile>
     <ClCompile Include="HistoryTrafficCalendarDlg.cpp">
       <Filter>源文件和头文件\对话框类\HistoryTrafficDlg</Filter>
+    </ClCompile>
+    <ClCompile Include="HistoryTrafficRealtimeDlg.cpp">
+      <Filter>源文件和头文件\对话框类\HistoryTrafficDlg</Filter>
+    </ClCompile>
+    <ClCompile Include="SecTrafficStore.cpp">
+      <Filter>源文件和头文件\公共的类\HistoryTrafficFile</Filter>
     </ClCompile>
     <ClCompile Include="CalendarHelper.cpp">
       <Filter>源文件和头文件\公共的类\CalendarHelper</Filter>

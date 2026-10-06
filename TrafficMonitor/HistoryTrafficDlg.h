@@ -3,6 +3,7 @@
 #include "Common.h"
 #include "HistoryTrafficListDlg.h"
 #include "HistoryTrafficCalendarDlg.h"
+#include "HistoryTrafficRealtimeDlg.h"
 #include "BaseDialog.h"
 
 // CHistoryTrafficDlg 对话框
@@ -23,12 +24,13 @@ public:
 public:
     CHistoryTrafficListDlg m_tab1_dlg;
     CHistoryTrafficCalendarDlg m_tab2_dlg;
+    CHistoryTrafficRealtimeDlg m_tab3_dlg;
 
 protected:
     deque<HistoryTraffic>& m_history_traffics;
 
     CTabCtrl m_tab;
-    int m_tab_selected;
+    int m_tab_selected{};
 
 protected:
     virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持

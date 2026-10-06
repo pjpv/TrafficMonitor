@@ -817,6 +817,8 @@
     <ClInclude Include="IconSelectDlg.h" />
     <ClInclude Include="IniHelper.h" />
     <ClInclude Include="HistoryTrafficListCtrl.h" />
+    <ClInclude Include="HistoryTrafficRealtimeDlg.h" />
+    <ClInclude Include="SecTrafficStore.h" />
     <ClInclude Include="ListCtrlEx.h" />
     <ClInclude Include="MainWndColorDlg.h" />
     <ClInclude Include="MainWndSettingsDlg.h" />
@@ -917,6 +919,8 @@
     <ClCompile Include="IconSelectDlg.cpp" />
     <ClCompile Include="IniHelper.cpp" />
     <ClCompile Include="HistoryTrafficListCtrl.cpp" />
+    <ClCompile Include="HistoryTrafficRealtimeDlg.cpp" />
+    <ClCompile Include="SecTrafficStore.cpp" />
     <ClCompile Include="ListCtrlEx.cpp" />
     <ClCompile Include="MainWndColorDlg.cpp" />
     <ClCompile Include="MainWndSettingsDlg.cpp" />

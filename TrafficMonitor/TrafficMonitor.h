@@ -22,6 +22,7 @@
 #include "StrTable.h"
 #include "PluginUpdateHelper.h"
 #include "PluginInterface.h"
+#include "SecTrafficStore.h"
 
 // CTrafficMonitorApp:
 // 有关此类的实现，请参阅 TrafficMonitor.cpp
@@ -90,6 +91,7 @@ public:
     CDllFunctions m_dll_functions;
     CStrTable m_str_table;
     CPluginUpdateHelper m_plugin_update;
+    CSecTrafficStore m_sec_traffic;     //秒級歷史流量
 
     CMenu m_main_menu;          //主窗口右键菜单
     CMenu m_main_menu_plugin;   //右击主窗口插件区域的右键菜单

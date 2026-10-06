@@ -285,6 +285,11 @@ void CTrafficMonitorApp::LoadConfig()
     m_last_light_mode = ini.GetBool(L"other", L"last_light_mode", CWindowsSettingHelper::IsWindows10LightTheme());
     m_show_mouse_panetrate_tip = ini.GetBool(L"other", L"show_mouse_panetrate_tip", true);
     m_show_dot_net_notinstalled_tip = ini.GetBool(L"other", L"show_dot_net_notinstalled_tip", true);
+
+    //秒級歷史流量設置
+    m_sec_traffic.SetEnabled(ini.GetBool(L"sec_traffic", L"enable", true));
+    m_sec_traffic.SetKeepDays(ini.GetInt(L"sec_traffic", L"keep_days", 90));
+    m_sec_traffic.Init(m_config_dir + L"sec_traffic");
 }
 
 void CTrafficMonitorApp::SaveConfig()
@@ -440,6 +445,10 @@ void CTrafficMonitorApp::SaveConfig()
     ini.WriteBool(_T("other"), _T("show_dot_net_notinstalled_tip"), m_show_dot_net_notinstalled_tip);
 
     ini.WriteString(L"config", L"plugin_disabled", m_cfg_data.plugin_disabled.ToString());
+
+    //秒級歷史流量設置
+    ini.WriteBool(L"sec_traffic", L"enable", m_sec_traffic.IsEnabled());
+    ini.WriteInt(L"sec_traffic", L"keep_days", m_sec_traffic.GetKeepDays());
 
     ini.WriteString(L"app", L"version", VERSION);
 

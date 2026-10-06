@@ -1278,6 +1278,9 @@ void CTrafficMonitorDlg::DoMonitorAcquisition()
     theApp.m_in_speed = static_cast<unsigned __int64>(cur_in_speed * 1000 / time_span);
     theApp.m_out_speed = static_cast<unsigned __int64>(cur_out_speed * 1000 / time_span);
 
+    //记录秒级历史流量
+    theApp.m_sec_traffic.AddSample(theApp.m_in_speed, theApp.m_out_speed, time_span);
+
     m_connection_change_flag = false;    //清除连接发生变化的标志
 
     m_last_in_bytes = m_in_bytes;
@@ -1573,6 +1576,10 @@ void CTrafficMonitorDlg::DoMonitorAcquisition()
             plugin_info.plugin->OnMonitorInfo(monitor_info);
         }
     }
+
+    //每30秒将秒级历史流量写入磁盘，避免频繁的磁盘写入
+    if (m_monitor_time_cnt % GetMonitorTimerCount(30) == GetMonitorTimerCount(30) - 1)
+        theApp.m_sec_traffic.Flush();
 
     m_monitor_time_cnt++;
 
@@ -2191,6 +2198,7 @@ void CTrafficMonitorDlg::OnClose()
     theApp.SaveConfig();    //退出前保存设置到ini文件
     theApp.SaveGlobalConfig();
     SaveHistoryTrafficFull();  // 退出时使用完整保存，确保所有数据都保存
+    theApp.m_sec_traffic.Flush();  // 退出时将秒级历史流量写入磁盘
     BackupHistoryTrafficFile();
 
     if (IsTaskbarWndValid())
@@ -2810,6 +2818,7 @@ BOOL CTrafficMonitorDlg::OnQueryEndSession()
     theApp.SaveConfig();
     theApp.SaveGlobalConfig();
     SaveHistoryTrafficFull();  // 系统关机时使用完整保存，确保所有数据都保存
+    theApp.m_sec_traffic.Flush();  // 系统关机时将秒级历史流量写入磁盘
     BackupHistoryTrafficFile();
 
     if (theApp.m_debug_log)

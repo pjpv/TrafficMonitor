@@ -29,13 +29,16 @@ protected:
     };
 
     CComboBox m_range_combo;
+    CComboBox m_scale_combo;
     int m_range_seconds{ 60 };                  // 當前選取的時間區間（秒）
+    bool m_log_scale{ false };                  // 縱軸是否採用對數比例（預設線性）
     std::vector<SecTrafficRecord> m_records;    // 當前時間區間內的記錄
     CString m_info_text;                        // 頂部顯示的當前網速文字
     CRect m_chart_rect;                         // 圖表的繪製區域
     CFont m_axis_font;                          // 座標軸標籤使用的字體
 
     void InitRangeCombo();
+    void InitScaleCombo();
     void UpdateRecords();                       // 重新載入當前時間區間內的記錄
     void UpdateInfoText();                      // 更新頂部顯示的當前網速文字
     void CalculateChartRect();
@@ -54,4 +57,5 @@ public:
     afx_msg void OnSize(UINT nType, int cx, int cy);
     afx_msg void OnDestroy();
     afx_msg void OnCbnSelchangeSecRangeCombo();
+    afx_msg void OnCbnSelchangeSecScaleCombo();
 };

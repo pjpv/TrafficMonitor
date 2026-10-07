@@ -34,7 +34,7 @@ namespace
     const int Y_GRID_COUNT = 4;     // 縱軸網格線數量
     const int X_GRID_COUNT = 4;     // 橫軸網格線數量
 
-    // 縱軸對數比例的基準值（1 KB/s），低於此值的速度一律繪於底線
+    // 對數比例的基準值（1 KB/s），低於此值的速度一律繪於底線；軸頂保底值（本值的 4 倍）對兩種比例同樣生效
     constexpr unsigned __int64 SEC_AXIS_MIN_SPEED = 1024;
 
     // 相鄰記錄的時間間隔超過此秒數時，視為程式未執行造成的資料中斷
@@ -58,6 +58,7 @@ void CHistoryTrafficRealtimeDlg::DoDataExchange(CDataExchange* pDX)
 {
     CTabDlg::DoDataExchange(pDX);
     DDX_Control(pDX, IDC_SEC_RANGE_COMBO, m_range_combo);
+    DDX_Control(pDX, IDC_SEC_SCALE_COMBO, m_scale_combo);
 }
 
 BEGIN_MESSAGE_MAP(CHistoryTrafficRealtimeDlg, CTabDlg)
@@ -66,6 +67,7 @@ BEGIN_MESSAGE_MAP(CHistoryTrafficRealtimeDlg, CTabDlg)
     ON_WM_SIZE()
     ON_WM_DESTROY()
     ON_CBN_SELCHANGE(IDC_SEC_RANGE_COMBO, &CHistoryTrafficRealtimeDlg::OnCbnSelchangeSecRangeCombo)
+    ON_CBN_SELCHANGE(IDC_SEC_SCALE_COMBO, &CHistoryTrafficRealtimeDlg::OnCbnSelchangeSecScaleCombo)
 END_MESSAGE_MAP()
 
 BOOL CHistoryTrafficRealtimeDlg::OnInitDialog()
@@ -73,6 +75,7 @@ BOOL CHistoryTrafficRealtimeDlg::OnInitDialog()
     CTabDlg::OnInitDialog();
 
     InitRangeCombo();
+    InitScaleCombo();
 
     // 座標軸標籤使用比對話框字體稍小的字體
     CFont* p_font = GetFont();
@@ -211,6 +214,20 @@ void CHistoryTrafficRealtimeDlg::OnCbnSelchangeSecRangeCombo()
     Invalidate(FALSE);
 }
 
+void CHistoryTrafficRealtimeDlg::InitScaleCombo()
+{
+    m_scale_combo.ResetContent();
+    m_scale_combo.AddString(CCommon::LoadText(L"TXT_SEC_SCALE_LINEAR"));
+    m_scale_combo.AddString(CCommon::LoadText(L"TXT_SEC_SCALE_LOG"));
+    m_scale_combo.SetCurSel(m_log_scale ? 1 : 0);
+}
+
+void CHistoryTrafficRealtimeDlg::OnCbnSelchangeSecScaleCombo()
+{
+    m_log_scale = (m_scale_combo.GetCurSel() == 1);
+    Invalidate(FALSE);
+}
+
 void CHistoryTrafficRealtimeDlg::OnPaint()
 {
     CPaintDC dc(this);
@@ -247,7 +264,7 @@ void CHistoryTrafficRealtimeDlg::DrawChart(CDrawCommon& drawer)
     unsigned int now = static_cast<unsigned int>(::time(nullptr)) + 1;
     unsigned int from = now > range ? now - range : 0;
 
-    // 縱軸採用對數比例：網速的動態範圍可達數百倍，線性比例會令低流量永遠貼近底線而無法辨識
+    // 軸頂取當前區間峰值；對數比例下網速動態範圍可達數百倍，線性比例會令低流量永遠貼近底線而無法辨識
     unsigned __int64 max_speed{};
     for (const SecTrafficRecord& record : m_records)
     {
@@ -256,22 +273,32 @@ void CHistoryTrafficRealtimeDlg::DrawChart(CDrawCommon& drawer)
         if (record.up_speed > max_speed)
             max_speed = record.up_speed;
     }
-    // 保證至少有 4 倍的動態範圍，避免資料平坦時比例失真
+    // 軸頂不低於 4 KB/s：線性比例避免零峰值時除以零，對數比例保證最低動態範圍
     if (max_speed < SEC_AXIS_MIN_SPEED * 4)
         max_speed = SEC_AXIS_MIN_SPEED * 4;
 
+    const double axis_max = static_cast<double>(max_speed);
     const double log_min = std::log(static_cast<double>(SEC_AXIS_MIN_SPEED));
-    const double log_span = std::log(static_cast<double>(max_speed)) - log_min;
+    const double log_span = std::log(axis_max) - log_min;
 
     // 將速度換算成由繪圖區底部起算的像素高度
     auto to_pixels = [&](unsigned __int64 speed) -> int
     {
         double value = static_cast<double>(speed);
-        if (value < static_cast<double>(SEC_AXIS_MIN_SPEED))
-            value = static_cast<double>(SEC_AXIS_MIN_SPEED);
-        if (value > static_cast<double>(max_speed))
-            value = static_cast<double>(max_speed);
-        return static_cast<int>((std::log(value) - log_min) / log_span * plot_rect.Height() + 0.5);
+        if (value > axis_max)
+            value = axis_max;
+        double ratio;
+        if (m_log_scale)
+        {
+            if (value < static_cast<double>(SEC_AXIS_MIN_SPEED))
+                value = static_cast<double>(SEC_AXIS_MIN_SPEED);
+            ratio = (std::log(value) - log_min) / log_span;
+        }
+        else
+        {
+            ratio = value / axis_max;
+        }
+        return static_cast<int>(ratio * plot_rect.Height() + 0.5);
     };
 
     if (m_axis_font.GetSafeHandle() != nullptr)
@@ -283,7 +310,11 @@ void CHistoryTrafficRealtimeDlg::DrawChart(CDrawCommon& drawer)
         int y = plot_rect.bottom - plot_rect.Height() * i / Y_GRID_COUNT;
         drawer.DrawLine(CPoint(plot_rect.left, y), CPoint(plot_rect.right, y), CHART_GRID_COLOR);
 
-        unsigned __int64 value = static_cast<unsigned __int64>(std::exp(log_min + log_span * i / Y_GRID_COUNT) + 0.5);
+        unsigned __int64 value;
+        if (m_log_scale)
+            value = static_cast<unsigned __int64>(std::exp(log_min + log_span * i / Y_GRID_COUNT) + 0.5);
+        else
+            value = max_speed * i / Y_GRID_COUNT;
         CRect label_rect(0, y - theApp.DPI(8), plot_rect.left - theApp.DPI(4), y + theApp.DPI(8));
         drawer.DrawWindowText(label_rect, CCommon::DataSizeToString(value, false), CHART_TEXT_COLOR, IDrawCommon::Alignment::RIGHT);
     }

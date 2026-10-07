@@ -467,14 +467,15 @@
 // 秒級歷史流量
 #define IDD_HISTORY_TRAFFIC_REALTIME_DIALOG 349
 #define IDC_SEC_RANGE_COMBO             1222
+#define IDC_SEC_SCALE_COMBO             1223
 
 // Next default values for new objects
-// 
+//
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        350
 #define _APS_NEXT_COMMAND_VALUE         33666
-#define _APS_NEXT_CONTROL_VALUE         1223
+#define _APS_NEXT_CONTROL_VALUE         1224
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

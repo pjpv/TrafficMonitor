@@ -241,18 +241,15 @@ void CSecTrafficStore::LoadRangeFromFiles(unsigned int from, unsigned int to, st
 
     const time_t end = static_cast<time_t>(to);
 
-    // 以本地時間的「當日中午」為游標逐日前進，可避免日光節約時間造成的日期跳變
-    tm local_tm{};
-    time_t cursor = static_cast<time_t>(from);
-    localtime_s(&local_tm, &cursor);
-    local_tm.tm_hour = 12;
-    local_tm.tm_min = 0;
-    local_tm.tm_sec = 0;
-    local_tm.tm_isdst = -1;
-    cursor = mktime(&local_tm);
+    // 以「當日中午」代表一天，可避免日光節約時間造成的日期跳變。
+    // 迴圈必須比較「日期」而非時刻：若查詢範圍結束在中午之前（例如上午的 6 小時視圖），
+    // 當天中午已大於 end，直接比較時刻會把當天整日跳過，令檔案部分完全讀不到。
+    time_t cursor = NoonOfDay(static_cast<time_t>(from));
+    const time_t last_day = NoonOfDay(end);
 
-    while (cursor < end)
+    while (cursor <= last_day)
     {
+        tm local_tm{};
         localtime_s(&local_tm, &cursor);
         ReadSegmentFile(m_dir + SegmentFileName(local_tm), from, to, records);
 
@@ -263,6 +260,17 @@ void CSecTrafficStore::LoadRangeFromFiles(unsigned int from, unsigned int to, st
         local_tm.tm_isdst = -1;
         cursor = mktime(&local_tm);
     }
+}
+
+time_t CSecTrafficStore::NoonOfDay(time_t t)
+{
+    tm local_tm{};
+    localtime_s(&local_tm, &t);
+    local_tm.tm_hour = 12;
+    local_tm.tm_min = 0;
+    local_tm.tm_sec = 0;
+    local_tm.tm_isdst = -1;
+    return mktime(&local_tm);
 }
 
 void CSecTrafficStore::CleanUp()

@@ -344,9 +344,10 @@ void CHistoryTrafficRealtimeDlg::DrawChart(CDrawCommon& drawer)
     }
     else
     {
-        // 記錄數量過多時按像素列聚合為平均值，避免繪製過多線段
-        std::vector<unsigned __int64> down_sum(width, 0);
-        std::vector<unsigned __int64> up_sum(width, 0);
+        // 記錄數量過多時按像素列聚合，取列內「最大值」而非平均值：
+        // 一秒的突發流量被數十秒稀釋後會從圖上消失，只有最大值能保留突發
+        std::vector<unsigned __int64> down_max(width, 0);
+        std::vector<unsigned __int64> up_max(width, 0);
         std::vector<int> count(width, 0);
         for (const SecTrafficRecord& record : m_records)
         {
@@ -358,8 +359,10 @@ void CHistoryTrafficRealtimeDlg::DrawChart(CDrawCommon& drawer)
             int x = static_cast<int>(static_cast<unsigned __int64>(offset) * width / range);
             if (x < 0 || x >= width)
                 continue;
-            down_sum[x] += record.down_speed;
-            up_sum[x] += record.up_speed;
+            if (record.down_speed > down_max[x])
+                down_max[x] = record.down_speed;
+            if (record.up_speed > up_max[x])
+                up_max[x] = record.up_speed;
             count[x]++;
         }
 
@@ -372,8 +375,8 @@ void CHistoryTrafficRealtimeDlg::DrawChart(CDrawCommon& drawer)
 
             SecChartPoint point;
             point.x = plot_rect.left + x;
-            point.down = to_pixels(down_sum[x] / count[x]);
-            point.up = to_pixels(up_sum[x] / count[x]);
+            point.down = to_pixels(down_max[x]);
+            point.up = to_pixels(up_max[x]);
             point.connect = has_prev && (x - prev_x <= 2);
             points.push_back(point);
 

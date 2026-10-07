@@ -68,6 +68,7 @@ private:
     std::wstring SegmentPath(unsigned int unix_second) const;   // 取得指定時間所屬的分段檔案路徑
     static std::wstring SegmentFileName(const struct tm& local_tm);
     static bool ParseSegmentDate(const std::wstring& file_name, int& year, int& month, int& day);
+    static time_t NoonOfDay(time_t t);      // 取得某時刻所屬日期的本地中午，用於逐日掃描分段檔案
 
 private:
     mutable std::mutex m_mutex;

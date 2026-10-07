@@ -88,7 +88,8 @@ enum class DoubleClickAction
     TASK_MANAGER,       //任务管理器
     SEPCIFIC_APP,       //指定应用程序
     CHANGE_SKIN,        //更换皮肤
-    NONE                //不执行任何动作
+    NONE,               //不执行任何动作
+    PLUGIN_DETAIL_WINDOW    //打开插件详情窗口（须插件接口版本>=9支持）
 };
 
 //颜色模式

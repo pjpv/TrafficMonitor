@@ -245,6 +245,7 @@ BOOL CMainWndSettingsDlg::OnInitDialog()
     m_double_click_combo.AddString(CCommon::LoadText(IDS_SPECIFIC_APP));
     m_double_click_combo.AddString(CCommon::LoadText(IDS_CHANGE_SKIN));
     m_double_click_combo.AddString(CCommon::LoadText(IDS_NONE));
+    m_double_click_combo.AddString(CCommon::LoadText(IDS_OPEN_PLUGIN_DETAIL_WINDOW));
     m_double_click_combo.SetCurSel(static_cast<int>(m_data.double_click_action));
 
     SetDlgItemText(IDC_EXE_PATH_EDIT, m_data.double_click_exe.c_str());

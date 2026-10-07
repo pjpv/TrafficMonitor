@@ -1239,6 +1239,15 @@ void CTaskBarDlg::OnLButtonDblClk(UINT nFlags, CPoint point)
     case DoubleClickAction::SEPCIFIC_APP:
         ShellExecuteW(NULL, _T("open"), (theApp.m_taskbar_data.double_click_exe).c_str(), NULL, NULL, SW_NORMAL);   //打开指定程序，默认任务管理器
         break;
+    case DoubleClickAction::PLUGIN_DETAIL_WINDOW:
+        //打开支持该能力的插件的详情窗口（接口版本>=9，旧版插件无此虚函数槽）
+        for (const auto& plugin_info : theApp.m_plugins.GetPlugins())
+        {
+            if (plugin_info.plugin != nullptr && plugin_info.state == CPluginManager::PluginState::PS_SUCCEED
+                && plugin_info.plugin->GetAPIVersion() >= 9)
+                plugin_info.plugin->OnDoubleClickAction();
+        }
+        break;
     default:
         break;
     }

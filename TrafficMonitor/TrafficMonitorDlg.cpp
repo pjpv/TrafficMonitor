@@ -2700,6 +2700,15 @@ void CTrafficMonitorDlg::OnLButtonDblClk(UINT nFlags, CPoint point)
     case DoubleClickAction::OPTIONS:
         OnOptions();                //双击后弹出“选项设置”对话框
         break;
+    case DoubleClickAction::PLUGIN_DETAIL_WINDOW:
+        //打开支持该能力的插件的详情窗口（接口版本>=9，旧版插件无此虚函数槽）
+        for (const auto& plugin_info : theApp.m_plugins.GetPlugins())
+        {
+            if (plugin_info.plugin != nullptr && plugin_info.state == CPluginManager::PluginState::PS_SUCCEED
+                && plugin_info.plugin->GetAPIVersion() >= 9)
+                plugin_info.plugin->OnDoubleClickAction();
+        }
+        break;
     case DoubleClickAction::TASK_MANAGER:
         ShellExecuteW(NULL, _T("open"), (theApp.m_system_dir + L"\\Taskmgr.exe").c_str(), NULL, NULL, SW_NORMAL);       //打开任务管理器
         break;

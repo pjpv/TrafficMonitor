@@ -183,7 +183,7 @@ public:
      * @attention 插件开发者不应该修改这里的返回值，也不应该重写此虚函数。
      * @return  int
      */
-    virtual int GetAPIVersion() const { return 8; }
+    virtual int GetAPIVersion() const { return 9; }
 
     /**
      * @brief   获取插件显示项目的对象
@@ -341,6 +341,14 @@ public:
      * @param   pApp
      */
     virtual void OnInitialize(ITrafficMonitor* pApp) {}
+
+    /**
+     * @brief   打开插件的详情窗口（若插件提供独立的信息窗口，如进程流量插件的监控窗口）
+     * @detail  主程序在用户选择「打开插件详情窗口」双击动作时调用。
+     *          仅对 GetAPIVersion() >= 9 的插件调用（旧版本插件的虚函数表没有此槽，直接调用会越界）。
+     *          窗口已打开时插件应将其置前，未打开时创建并显示。
+     */
+    virtual void OnDoubleClickAction() {}
 };
 
 

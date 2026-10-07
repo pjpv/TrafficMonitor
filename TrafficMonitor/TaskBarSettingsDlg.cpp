@@ -364,7 +364,9 @@ BOOL CTaskBarSettingsDlg::OnInitDialog()
     m_double_click_combo.AddString(CCommon::LoadText(IDS_OPEN_OPTION_SETTINGS));
     m_double_click_combo.AddString(CCommon::LoadText(IDS_OPEN_TASK_MANAGER));
     m_double_click_combo.AddString(CCommon::LoadText(IDS_SPECIFIC_APP));
+    m_double_click_combo.AddString(CCommon::LoadText(IDS_CHANGE_SKIN));
     m_double_click_combo.AddString(CCommon::LoadText(IDS_NONE));
+    m_double_click_combo.AddString(CCommon::LoadText(IDS_OPEN_PLUGIN_DETAIL_WINDOW));
     m_double_click_combo.SetCurSel(static_cast<int>(m_data.double_click_action));
 
     m_digit_number_combo.AddString(_T("3"));

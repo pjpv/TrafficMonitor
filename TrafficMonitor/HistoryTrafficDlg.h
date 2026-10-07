@@ -30,7 +30,7 @@ protected:
     deque<HistoryTraffic>& m_history_traffics;
 
     CTabCtrl m_tab;
-    int m_tab_selected{};
+    int m_tab_selected{ 2 };    //預設顯示「實時」分頁
 
 protected:
     virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
